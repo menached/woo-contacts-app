@@ -1,0 +1,123 @@
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
+
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px; /* Existing padding */
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #fff;
+}
+
+body {
+  background-color: #f4f4f4;
+  margin: 0;
+  font-family: Arial, sans-serif;
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+th {
+  background-color: #f2f2f2;
+  text-align: left;
+}
+
+button {
+  background-color: #4CAF50;
+  color: white;
+  padding: 10px;
+  margin: 5px;
+  border: none;
+  cursor: pointer;
+}
+
+button:disabled {
+  background-color: #ccc;
+}
+
+button:hover:not(:disabled) {
+  background-color: #45a049;
+}
+
+select {
+  padding: 8px;
+  margin: 10px 0;
+}
+
+.pagination {
+  display: flex;
+  justify-content: space-between;
+}
+
+/* Container for the filter controls */
+.filter-controls {
+  display: flex;
+  justify-content: space-between; /* Spreads the items evenly */
+  flex-wrap: wrap; /* Allows wrapping if the screen is small */
+  gap: 10px; /* Adds spacing between the dropdowns */
+  margin-bottom: 20px; /* Adds space below the dropdowns */
+}
+
+.filter-controls div {
+  flex: 1; /* Ensures all dropdowns take up equal space */
+  min-width: 150px; /* Optional: Set a minimum width for each dropdown */
+}
+
+/* Style for each dropdown */
+.filter-controls select {
+  width: 100%; /* Make each dropdown take up full width of its container */
+  padding: 8px; /* Adds padding for better appearance */
+}
+
