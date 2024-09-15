@@ -8,20 +8,22 @@ function App() {
   const [totalPages, setTotalPages] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [totalRecords, setTotalRecords] = useState(0);
-  const [cities, setCities] = useState(['All']);
-  const [zipCodes, setZipCodes] = useState(['All']);
-  const [areaCodes, setAreaCodes] = useState(['All']);
-  const [categories, setCategories] = useState(['All']);
+  const [sortColumn, setSortColumn] = useState(null);
+  const [sortOrder, setSortOrder] = useState('asc'); // or 'desc' for descending order
+  const [cities, setCities] = useState([]);
+  const [zipCodes, setZipCodes] = useState([]);
+  const [areaCodes, setAreaCodes] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [selectedCity, setSelectedCity] = useState('All');
   const [selectedZipCode, setSelectedZipCode] = useState('All');
   const [selectedAreaCode, setSelectedAreaCode] = useState('All');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
-  const [sortColumn, setSortColumn] = useState(null);
-  const [sortOrder, setSortOrder] = useState('asc');
 
-  const fetchContacts = (page, limit, city, zipCode, areaCode, category, search) => {
-    const query = `http://localhost:5000/contacts?page=${page}&limit=${limit}&city=${city}&zipCode=${zipCode}&areaCode=${areaCode}&category=${category}&search=${search}`;
+  // Fetch contacts from the backend API with pagination, sorting, filters, and search
+  const fetchContacts = (page, limit, sortColumn, sortOrder) => {
+    let query = `http://localhost:5000/contacts?page=${page}&limit=${limit}&sortColumn=${sortColumn}&sortOrder=${sortOrder}&city=${selectedCity}&zipCode=${selectedZipCode}&areaCode=${selectedAreaCode}&category=${selectedCategory}&search=${searchQuery}`;
+    
     axios
       .get(query)
       .then(response => {
@@ -35,6 +37,7 @@ function App() {
       });
   };
 
+  // Fetch filters (cities, zip codes, area codes, and categories) from the backend
   const fetchFilters = () => {
     axios
       .get('http://localhost:5000/filters')
@@ -51,23 +54,31 @@ function App() {
 
   useEffect(() => {
     fetchFilters();
-    fetchContacts(currentPage, rowsPerPage, selectedCity, selectedZipCode, selectedAreaCode, selectedCategory, searchQuery);
-  }, [currentPage, rowsPerPage, selectedCity, selectedZipCode, selectedAreaCode, selectedCategory, searchQuery]);
+    fetchContacts(currentPage, rowsPerPage, sortColumn, sortOrder);
+  }, [currentPage, rowsPerPage, sortColumn, sortOrder, selectedCity, selectedZipCode, selectedAreaCode, selectedCategory, searchQuery]);
 
+  // Define the handleSort function to sort the table columns
+  const handleSort = (column) => {
+    const order = sortColumn === column && sortOrder === 'asc' ? 'desc' : 'asc';
+    setSortColumn(column);
+    setSortOrder(order);
+  };
+
+  // Handle CSV download
   const handleDownloadCSV = () => {
     const query = `http://localhost:5000/contacts/download?city=${selectedCity}&zipCode=${selectedZipCode}&areaCode=${selectedAreaCode}&category=${selectedCategory}&search=${searchQuery}`;
     axios({
       url: query,
       method: 'GET',
-      responseType: 'blob',
-    }).then(response => {
+      responseType: 'blob', // important for downloading files
+    }).then((response) => {
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement('a');
       link.href = url;
       link.setAttribute('download', 'filtered_contacts.csv');
       document.body.appendChild(link);
       link.click();
-      document.body.removeChild(link);
+      document.body.removeChild(link); // Clean up
     }).catch(error => {
       console.error('Error downloading CSV:', error);
     });
@@ -75,8 +86,7 @@ function App() {
 
   return (
     <div className="container">
-      {/* Title with Tooltip */}
-      <h1 title={`Total Records: ${totalRecords}`}>Dave's Contact List Generator</h1>
+      <h1>Dave's Contact List Generator ({totalRecords} Total Records)</h1>
 
       {/* Filter Controls */}
       <div className="filter-controls">
@@ -93,25 +103,25 @@ function App() {
         <div>
           <label>City: </label>
           <select value={selectedCity} onChange={(e) => setSelectedCity(e.target.value)}>
-            {cities.map(city => <option key={city} value={city}>{city}</option>)}
+            {cities.map((city) => <option key={city} value={city}>{city}</option>)}
           </select>
         </div>
         <div>
           <label>ZIP Code: </label>
           <select value={selectedZipCode} onChange={(e) => setSelectedZipCode(e.target.value)}>
-            {zipCodes.map(zip => <option key={zip} value={zip}>{zip}</option>)}
+            {zipCodes.map((zip) => <option key={zip} value={zip}>{zip}</option>)}
           </select>
         </div>
         <div>
           <label>Area Code: </label>
           <select value={selectedAreaCode} onChange={(e) => setSelectedAreaCode(e.target.value)}>
-            {areaCodes.map(areaCode => <option key={areaCode} value={areaCode}>{areaCode}</option>)}
+            {areaCodes.map((areaCode) => <option key={areaCode} value={areaCode}>{areaCode}</option>)}
           </select>
         </div>
         <div>
           <label>Category: </label>
           <select value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)}>
-            {categories.map(category => <option key={category} value={category}>{category}</option>)}
+            {categories.map((category) => <option key={category} value={category}>{category}</option>)}
           </select>
         </div>
         <div>
@@ -130,31 +140,35 @@ function App() {
         </div>
       </div>
 
-      {/* Top Pagination Controls - Only show buttons, hide page numbers */}
-      <div className="pagination top-pagination">
-        <button onClick={() => setCurrentPage(1)} disabled={currentPage === 1}>First</button>
-        <button onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage === 1}>Previous</button>
-        {/* Hide page number display here */}
-        <button onClick={() => setCurrentPage(currentPage + 1)} disabled={currentPage === totalPages}>Next</button>
-        <button onClick={() => setCurrentPage(totalPages)} disabled={currentPage === totalPages}>Last</button>
-      </div>
-
-      {/* Contacts Table */}
+      {/* Table with sortable columns */}
       <table>
         <thead>
           <tr>
-            <th onClick={() => handleSort('full_name')}>Full Name {sortColumn === 'full_name' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}</th>
-            <th onClick={() => handleSort('email')}>Email {sortColumn === 'email' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}</th>
-            <th onClick={() => handleSort('phone_number')}>Phone Number {sortColumn === 'phone_number' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}</th>
-            <th onClick={() => handleSort('street_address')}>Street Address {sortColumn === 'street_address' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}</th>
-            <th onClick={() => handleSort('city')}>City {sortColumn === 'city' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}</th>
-            <th onClick={() => handleSort('zip_code')}>ZIP Code {sortColumn === 'zip_code' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}</th>
-            <th onClick={() => handleSort('area_code')}>Area Code {sortColumn === 'area_code' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}</th>
-            <th onClick={() => handleSort('category')}>Category {sortColumn === 'category' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}</th>
+            <th onClick={() => handleSort('full_name')}>
+              Full Name {sortColumn === 'full_name' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
+            </th>
+            <th onClick={() => handleSort('email')}>
+              Email {sortColumn === 'email' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
+            </th>
+            <th onClick={() => handleSort('phone_number')}>
+              Phone Number {sortColumn === 'phone_number' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
+            </th>
+            <th onClick={() => handleSort('street_address')}>
+              Street Address {sortColumn === 'street_address' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
+            </th>
+            <th onClick={() => handleSort('city')}>
+              City {sortColumn === 'city' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
+            </th>
+            <th onClick={() => handleSort('zip_code')}>
+              ZIP Code {sortColumn === 'zip_code' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
+            </th>
+            <th onClick={() => handleSort('category')}>
+              Category {sortColumn === 'category' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
+            </th>
           </tr>
         </thead>
         <tbody>
-          {contacts.map(contact => (
+          {contacts.map((contact) => (
             <tr key={contact.id}>
               <td>{contact.full_name}</td>
               <td>{contact.email}</td>
@@ -162,20 +176,29 @@ function App() {
               <td>{contact.street_address}</td>
               <td>{contact.city}</td>
               <td>{contact.zip_code}</td>
-              <td>{contact.phone_number.startsWith('+1') ? contact.phone_number.substring(2, 5) : contact.phone_number.substring(0, 3)}</td>
               <td>{contact.category}</td>
             </tr>
           ))}
         </tbody>
       </table>
 
-      {/* Bottom Pagination Controls */}
-      <div className="pagination bottom-pagination">
-        <button onClick={() => setCurrentPage(1)} disabled={currentPage === 1}>First</button>
-        <button onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage === 1}>Previous</button>
-        <span>Page {currentPage} of {totalPages}</span> {/* Only show this at the bottom */}
-        <button onClick={() => setCurrentPage(currentPage + 1)} disabled={currentPage === totalPages}>Next</button>
-        <button onClick={() => setCurrentPage(totalPages)} disabled={currentPage === totalPages}>Last</button>
+      {/* Pagination controls */}
+      <div className="pagination">
+        <button onClick={() => setCurrentPage(1)} disabled={currentPage === 1}>
+          First
+        </button>
+        <button onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage === 1}>
+          Previous
+        </button>
+        <span>
+          Page {currentPage} of {totalPages}
+        </span>
+        <button onClick={() => setCurrentPage(currentPage + 1)} disabled={currentPage === totalPages}>
+          Next
+        </button>
+        <button onClick={() => setCurrentPage(totalPages)} disabled={currentPage === totalPages}>
+          Last
+        </button>
       </div>
     </div>
   );
