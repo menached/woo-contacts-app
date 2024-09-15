@@ -74,6 +74,8 @@ th {
   text-align: left;
 }
 
+
+/* Existing button styles */
 button {
   background-color: #4CAF50;
   color: white;
@@ -90,6 +92,44 @@ button:disabled {
 button:hover:not(:disabled) {
   background-color: #45a049;
 }
+
+/* Less dominating pagination buttons */
+.pagination button {
+  background-color: #f2f2f2; /* Light gray background */
+  color: #333; /* Darker text color */
+  padding: 5px 10px; /* Smaller padding */
+  font-size: 0.9em; /* Slightly smaller font size */
+  border: 1px solid #ccc; /* Add a subtle border */
+  margin: 2px; /* Less margin between buttons */
+}
+
+.pagination button:hover:not(:disabled) {
+  background-color: #e0e0e0; /* Slightly darker gray on hover */
+}
+
+.pagination button:disabled {
+  background-color: #f9f9f9; /* Even lighter background for disabled */
+  color: #aaa; /* Lighter text color for disabled state */
+}
+
+
+
+/*button {*/
+  /*background-color: #4CAF50;*/
+  /*color: white;*/
+  /*padding: 10px;*/
+  /*margin: 5px;*/
+  /*border: none;*/
+  /*cursor: pointer;*/
+/*}*/
+
+/*button:disabled {*/
+  /*background-color: #ccc;*/
+/*}*/
+
+/*button:hover:not(:disabled) {*/
+  /*background-color: #45a049;*/
+/*}*/
 
 select {
   padding: 8px;
