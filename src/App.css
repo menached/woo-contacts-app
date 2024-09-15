@@ -121,3 +121,22 @@ select {
   padding: 8px; /* Adds padding for better appearance */
 }
 
+
+button.download-button {
+  float: right;
+  background-color: #4CAF50;
+  color: white;
+  padding: 10px;
+  margin: 5px;
+  border: none;
+  cursor: pointer;
+}
+
+button.download-button:disabled {
+  background-color: #ccc;
+}
+
+button.download-button:hover:not(:disabled) {
+  background-color: #45a049;
+}
+

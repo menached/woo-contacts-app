@@ -118,50 +118,30 @@ function App() {
   };
 
 
-// Download the current view (all filtered records) as CSV
 const handleDownloadCSV = () => {
+  // Build the query string using the current filters
   const query = `http://localhost:5000/contacts/download?city=${selectedCity}&zipCode=${selectedZipCode}&areaCode=${selectedAreaCode}&category=${selectedCategory}&search=${searchQuery}`;
+
   axios({
     url: query,
     method: 'GET',
-    responseType: 'blob', // Important: This tells axios to treat the response as a blob (binary data)
+    responseType: 'blob' // Important for downloading the file
   })
-  .then((response) => {
-    const url = window.URL.createObjectURL(new Blob([response.data]));
-    const link = document.createElement('a');
-    link.href = url;
-    link.setAttribute('download', 'contacts.csv'); // Name of the file to be downloaded
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  })
-  .catch(error => {
-    console.error('Error downloading CSV:', error);
-  });
+    .then((response) => {
+      // Create a URL for the blob data
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', 'filtered_contacts.csv'); // Set download filename
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link); // Cleanup
+    })
+    .catch((error) => {
+      console.error('Error downloading CSV:', error);
+    });
 };
 
-
-
-  //// Download the current view (all filtered records) as CSV
-  //const handleDownloadCSV = () => {
-    //const query = `http://localhost:5000/contacts/download?city=${selectedCity}&zipCode=${selectedZipCode}&areaCode=${selectedAreaCode}&category=${selectedCategory}&search=${searchQuery}`;
-    //axios
-      //.get(query)
-      //.then(response => {
-        //const csv = jsonToCSV(response.data);
-        //const blob = new Blob([csv], { type: 'text/csv' });
-        //const url = window.URL.createObjectURL(blob);
-        //const link = document.createElement('a');
-        //link.href = url;
-        //link.setAttribute('download', 'contacts.csv');
-        //document.body.appendChild(link);
-        //link.click();
-        //document.body.removeChild(link);
-      //})
-      //.catch(error => {
-        //console.error('Error downloading CSV:', error);
-      //});
-  //};
 
   return (
     <div className="container">
@@ -231,7 +211,8 @@ const handleDownloadCSV = () => {
 
         {/* CSV Download Button */}
         <div>
-          <button onClick={handleDownloadCSV}>Download as CSV</button>
+          <button className="download-button" onClick={handleDownloadCSV}>Download as CSV</button>
+
         </div>
       </div>
 
