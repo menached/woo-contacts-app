@@ -75,6 +75,12 @@ th {
 }
 
 
+/* Hide the page number display in the top pagination */
+.top-pagination span {
+  display: none;
+}
+
+
 /* Existing button styles */
 button {
   background-color: #4CAF50;

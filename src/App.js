@@ -54,20 +54,6 @@ function App() {
     fetchContacts(currentPage, rowsPerPage, selectedCity, selectedZipCode, selectedAreaCode, selectedCategory, searchQuery);
   }, [currentPage, rowsPerPage, selectedCity, selectedZipCode, selectedAreaCode, selectedCategory, searchQuery]);
 
-  const handleSort = (column) => {
-    const newSortOrder = sortColumn === column && sortOrder === 'asc' ? 'desc' : 'asc';
-    const sortedContacts = [...contacts].sort((a, b) => {
-      const valA = a[column] ? a[column].toString().toLowerCase() : '';
-      const valB = b[column] ? b[column].toString().toLowerCase() : '';
-      if (valA < valB) return newSortOrder === 'asc' ? -1 : 1;
-      if (valA > valB) return newSortOrder === 'asc' ? 1 : -1;
-      return 0;
-    });
-    setContacts(sortedContacts);
-    setSortColumn(column);
-    setSortOrder(newSortOrder);
-  };
-
   const handleDownloadCSV = () => {
     const query = `http://localhost:5000/contacts/download?city=${selectedCity}&zipCode=${selectedZipCode}&areaCode=${selectedAreaCode}&category=${selectedCategory}&search=${searchQuery}`;
     axios({
@@ -89,11 +75,11 @@ function App() {
 
   return (
     <div className="container">
-      <h1>Dave's Contact List Generator ({totalRecords} Total Records)</h1>
+      {/* Title with Tooltip */}
+      <h1 title={`Total Records: ${totalRecords}`}>Dave's Contact List Generator</h1>
 
       {/* Filter Controls */}
       <div className="filter-controls">
-        {/* Filters and search box */}
         <div>
           <label>Rows per page: </label>
           <select value={rowsPerPage} onChange={(e) => setRowsPerPage(parseInt(e.target.value))}>
@@ -137,16 +123,18 @@ function App() {
             placeholder="Search contacts..."
           />
         </div>
+
+        {/* Download CSV Button */}
         <div>
           <button className="download-button" onClick={handleDownloadCSV}>Download as CSV</button>
         </div>
       </div>
 
-      {/* Navigation Buttons at the top */}
-      <div className="pagination">
+      {/* Top Pagination Controls - Only show buttons, hide page numbers */}
+      <div className="pagination top-pagination">
         <button onClick={() => setCurrentPage(1)} disabled={currentPage === 1}>First</button>
         <button onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage === 1}>Previous</button>
-        <span>Page {currentPage} of {totalPages}</span>
+        {/* Hide page number display here */}
         <button onClick={() => setCurrentPage(currentPage + 1)} disabled={currentPage === totalPages}>Next</button>
         <button onClick={() => setCurrentPage(totalPages)} disabled={currentPage === totalPages}>Last</button>
       </div>
@@ -181,11 +169,11 @@ function App() {
         </tbody>
       </table>
 
-      {/* Pagination Controls at the bottom */}
-      <div className="pagination">
+      {/* Bottom Pagination Controls */}
+      <div className="pagination bottom-pagination">
         <button onClick={() => setCurrentPage(1)} disabled={currentPage === 1}>First</button>
         <button onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage === 1}>Previous</button>
-        <span>Page {currentPage} of {totalPages}</span>
+        <span>Page {currentPage} of {totalPages}</span> {/* Only show this at the bottom */}
         <button onClick={() => setCurrentPage(currentPage + 1)} disabled={currentPage === totalPages}>Next</button>
         <button onClick={() => setCurrentPage(totalPages)} disabled={currentPage === totalPages}>Last</button>
       </div>
