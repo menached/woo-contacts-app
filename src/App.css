@@ -7,17 +7,29 @@
   pointer-events: none;
 }
 
-
 .filter-controls {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
   margin-bottom: 20px;
+  align-items: flex-end; /* Align items at the bottom */
 }
 
 .filter-controls div {
   flex: 1;
   min-width: 150px;
+}
+
+.filter-controls .download-container {
+  flex: 0;
+  margin-left: auto; /* Aligns the button to the right */
+}
+
+.filter-controls select,
+.filter-controls input {
+  width: 100%;
+  padding: 8px;
+  margin: 10px 0;
 }
 
 button.download-button {
@@ -28,9 +40,40 @@ button.download-button {
   cursor: pointer;
 }
 
-button.download-button:hover {
+button.download-button:hover:not(:disabled) {
   background-color: #45a049;
 }
+
+button.download-button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+
+
+/*.filter-controls {*/
+  /*display: flex;*/
+  /*flex-wrap: wrap;*/
+  /*gap: 10px;*/
+  /*margin-bottom: 20px;*/
+/*}*/
+
+/*.filter-controls div {*/
+  /*flex: 1;*/
+  /*min-width: 150px;*/
+/*}*/
+
+/*button.download-button {*/
+  /*background-color: #4CAF50;*/
+  /*color: white;*/
+  /*padding: 10px;*/
+  /*border: none;*/
+  /*cursor: pointer;*/
+/*}*/
+
+/*button.download-button:hover {*/
+  /*background-color: #45a049;*/
+/*}*/
 
 
 
