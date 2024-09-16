@@ -94,7 +94,7 @@ function App() {
 
   return (
     <div className="container">
-      <h1>Dave's Contact List Generator ({totalRecords} Total Records)</h1>
+      <h1 title={`Total Records: ${totalRecords}`}>Dave's goAutodial Campaign Generator</h1>
 
       {errorMessage && <p className="error">{errorMessage}</p>}
 
@@ -151,7 +151,7 @@ function App() {
             onClick={handleDownloadCSV} 
             disabled={downloadingCSV}  // Disable when downloading
           >
-            {downloadingCSV ? 'Downloading...' : 'Download as CSV'}
+            {downloadingCSV ? 'Downloading...' : 'Download for goAutodial'}
           </button>
         </div>
       </div>
