@@ -53,6 +53,12 @@ th {
   max-width: 220px; /* Ensure filters don't grow too large */
 }
 
+/* Multi-select styling */
+.filter-controls select[multiple] {
+  height: auto;
+  min-height: 150px; /* Adjust the height of the multi-select dropdown */
+}
+
 /* Limit the size of the select boxes to prevent overflow */
 .filter-controls select, 
 .filter-controls input {
@@ -123,61 +129,4 @@ th {
   color: #aaa;
   cursor: not-allowed;
 }
-
-
-
-/*.filter-controls {*/
-  /*display: flex;*/
-  /*flex-wrap: wrap;*/
-  /*gap: 10px;*/
-  /*margin-bottom: 20px;*/
-  /*align-items: flex-end;*/
-/*}*/
-
-/*.filter-controls div {*/
-  /*flex: 1;*/
-  /*min-width: 150px;*/
-/*}*/
-
-/*.filter-controls .download-container {*/
-  /*flex: 0;*/
-  /*margin-left: auto; [> Aligns the button to the right <]*/
-/*}*/
-
-/*button.download-button {*/
-  /*background-color: #4CAF50;*/
-  /*color: white;*/
-  /*padding: 10px;*/
-  /*border: none;*/
-  /*cursor: pointer;*/
-/*}*/
-
-/*button.download-button:disabled {*/
-  /*background-color: #ccc;*/
-  /*cursor: not-allowed;*/
-/*}*/
-
-/*button.download-button:hover:not(:disabled) {*/
-  /*background-color: #45a049;*/
-/*}*/
-
-/*.pagination {*/
-  /*display: flex;*/
-  /*justify-content: space-between;*/
-/*}*/
-
-/*.pagination button {*/
-  /*background-color: #f2f2f2;*/
-  /*color: #333;*/
-  /*padding: 5px 10px;*/
-  /*font-size: 0.9em;*/
-  /*border: 1px solid #ccc;*/
-  /*margin: 2px;*/
-/*}*/
-
-/*.pagination button:disabled {*/
-  /*background-color: #f9f9f9;*/
-  /*color: #aaa;*/
-  /*cursor: not-allowed;*/
-/*}*/
 

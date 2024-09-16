@@ -14,9 +14,9 @@ function App() {
   const [zipCodes, setZipCodes] = useState([]);
   const [areaCodes, setAreaCodes] = useState([]);
   const [categories, setCategories] = useState([]);
-  const [selectedCity, setSelectedCity] = useState('All');
-  const [selectedZipCode, setSelectedZipCode] = useState('All');
-  const [selectedAreaCode, setSelectedAreaCode] = useState('All');
+  const [selectedCities, setSelectedCities] = useState([]);
+  const [selectedZipCodes, setSelectedZipCodes] = useState([]);
+  const [selectedAreaCodes, setSelectedAreaCodes] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
@@ -24,7 +24,11 @@ function App() {
 
   // Fetch contacts from the backend API with pagination, sorting, filters, and search
   const fetchContacts = (page, limit, sortColumn, sortOrder) => {
-    let query = `http://localhost:5000/contacts?page=${page}&limit=${limit}&sortColumn=${sortColumn}&sortOrder=${sortOrder}&city=${selectedCity}&zipCode=${selectedZipCode}&areaCode=${selectedAreaCode}&category=${selectedCategory}&search=${searchQuery}`;
+    const cityQuery = selectedCities.length > 0 ? selectedCities.join(',') : 'All';
+    const zipCodeQuery = selectedZipCodes.length > 0 ? selectedZipCodes.join(',') : 'All';
+    const areaCodeQuery = selectedAreaCodes.length > 0 ? selectedAreaCodes.join(',') : 'All';
+
+    let query = `http://localhost:5000/contacts?page=${page}&limit=${limit}&sortColumn=${sortColumn}&sortOrder=${sortOrder}&city=${cityQuery}&zipCode=${zipCodeQuery}&areaCode=${areaCodeQuery}&category=${selectedCategory}&search=${searchQuery}`;
     
     axios
       .get(query)
@@ -46,10 +50,10 @@ function App() {
     axios
       .get('http://localhost:5000/filters')
       .then(response => {
-        setCities(['All', ...response.data.cities]);
-        setZipCodes(['All', ...response.data.zipCodes]);
-        setAreaCodes(['All', ...response.data.areaCodes]);
-        setCategories(['All', ...response.data.categories]);
+        setCities(response.data.cities);
+        setZipCodes(response.data.zipCodes);
+        setAreaCodes(response.data.areaCodes);
+        setCategories(response.data.categories);
       })
       .catch(error => {
         console.error('Error fetching filters:', error);
@@ -59,7 +63,7 @@ function App() {
   useEffect(() => {
     fetchFilters();
     fetchContacts(currentPage, rowsPerPage, sortColumn, sortOrder);
-  }, [currentPage, rowsPerPage, sortColumn, sortOrder, selectedCity, selectedZipCode, selectedAreaCode, selectedCategory, searchQuery]);
+  }, [currentPage, rowsPerPage, sortColumn, sortOrder, selectedCities, selectedZipCodes, selectedAreaCodes, selectedCategory, searchQuery]);
 
   // Define the handleSort function to sort the table columns
   const handleSort = (column) => {
@@ -71,7 +75,11 @@ function App() {
   // Handle CSV download
   const handleDownloadCSV = () => {
     setDownloadingCSV(true);  // Set the button as busy
-    const query = `http://localhost:5000/contacts/download?city=${selectedCity}&zipCode=${selectedZipCode}&areaCode=${selectedAreaCode}&category=${selectedCategory}&search=${searchQuery}`;
+    const cityQuery = selectedCities.length > 0 ? selectedCities.join(',') : 'All';
+    const zipCodeQuery = selectedZipCodes.length > 0 ? selectedZipCodes.join(',') : 'All';
+    const areaCodeQuery = selectedAreaCodes.length > 0 ? selectedAreaCodes.join(',') : 'All';
+    
+    const query = `http://localhost:5000/contacts/download?city=${cityQuery}&zipCode=${zipCodeQuery}&areaCode=${areaCodeQuery}&category=${selectedCategory}&search=${searchQuery}`;
     
     axios({
       url: query,
@@ -90,6 +98,12 @@ function App() {
       console.error('Error downloading CSV:', error);
       setDownloadingCSV(false);  // Reset even if download fails
     });
+  };
+
+  // Handle multi-select change
+  const handleMultiSelectChange = (event, setFunction) => {
+    const selectedOptions = Array.from(event.target.selectedOptions, option => option.value);
+    setFunction(selectedOptions);
   };
 
   return (
@@ -112,19 +126,19 @@ function App() {
         </div>
         <div>
           <label>City: </label>
-          <select value={selectedCity} onChange={(e) => setSelectedCity(e.target.value)}>
+          <select multiple value={selectedCities} onChange={(e) => handleMultiSelectChange(e, setSelectedCities)}>
             {cities.map((city) => <option key={city} value={city}>{city}</option>)}
           </select>
         </div>
         <div>
           <label>ZIP Code: </label>
-          <select value={selectedZipCode} onChange={(e) => setSelectedZipCode(e.target.value)}>
+          <select multiple value={selectedZipCodes} onChange={(e) => handleMultiSelectChange(e, setSelectedZipCodes)}>
             {zipCodes.map((zip) => <option key={zip} value={zip}>{zip}</option>)}
           </select>
         </div>
         <div>
           <label>Area Code: </label>
-          <select value={selectedAreaCode} onChange={(e) => setSelectedAreaCode(e.target.value)}>
+          <select multiple value={selectedAreaCodes} onChange={(e) => handleMultiSelectChange(e, setSelectedAreaCodes)}>
             {areaCodes.map((areaCode) => <option key={areaCode} value={areaCode}>{areaCode}</option>)}
           </select>
         </div>
