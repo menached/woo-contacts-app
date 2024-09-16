@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './App.css';
 
@@ -9,7 +9,7 @@ function App() {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [totalRecords, setTotalRecords] = useState(0);
   const [sortColumn, setSortColumn] = useState(null);
-  const [sortOrder, setSortOrder] = useState('asc'); // or 'desc' for descending order
+  const [sortOrder, setSortOrder] = useState('asc');
   const [cities, setCities] = useState([]);
   const [zipCodes, setZipCodes] = useState([]);
   const [areaCodes, setAreaCodes] = useState([]);
@@ -19,6 +19,8 @@ function App() {
   const [selectedAreaCode, setSelectedAreaCode] = useState('All');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+  const [downloadingCSV, setDownloadingCSV] = useState(false);
 
   // Fetch contacts from the backend API with pagination, sorting, filters, and search
   const fetchContacts = (page, limit, sortColumn, sortOrder) => {
@@ -31,9 +33,11 @@ function App() {
         setTotalPages(response.data.totalPages);
         setCurrentPage(response.data.currentPage);
         setTotalRecords(response.data.totalContacts);
+        setErrorMessage('');  // Reset error message
       })
       .catch(error => {
         console.error('Error fetching contacts:', error);
+        setErrorMessage('Failed to load contacts. Please try again later.');
       });
   };
 
@@ -66,7 +70,9 @@ function App() {
 
   // Handle CSV download
   const handleDownloadCSV = () => {
+    setDownloadingCSV(true);  // Set the button as busy
     const query = `http://localhost:5000/contacts/download?city=${selectedCity}&zipCode=${selectedZipCode}&areaCode=${selectedAreaCode}&category=${selectedCategory}&search=${searchQuery}`;
+    
     axios({
       url: query,
       method: 'GET',
@@ -78,15 +84,19 @@ function App() {
       link.setAttribute('download', 'filtered_contacts.csv');
       document.body.appendChild(link);
       link.click();
-      document.body.removeChild(link); // Clean up
+      document.body.removeChild(link);  // Clean up
+      setDownloadingCSV(false);  // Reset after download is complete
     }).catch(error => {
       console.error('Error downloading CSV:', error);
+      setDownloadingCSV(false);  // Reset even if download fails
     });
   };
 
   return (
     <div className="container">
       <h1>Dave's Contact List Generator ({totalRecords} Total Records)</h1>
+
+      {errorMessage && <p className="error">{errorMessage}</p>}
 
       {/* Filter Controls */}
       <div className="filter-controls">
@@ -135,52 +145,62 @@ function App() {
         </div>
 
         {/* Download CSV Button */}
-        <div>
-          <button className="download-button" onClick={handleDownloadCSV}>Download as CSV</button>
+        <div className="download-container">
+          <button 
+            className="download-button" 
+            onClick={handleDownloadCSV} 
+            disabled={downloadingCSV}  // Disable when downloading
+          >
+            {downloadingCSV ? 'Downloading...' : 'Download as CSV'}
+          </button>
         </div>
       </div>
 
       {/* Table with sortable columns */}
-      <table>
-        <thead>
-          <tr>
-            <th onClick={() => handleSort('full_name')}>
-              Full Name {sortColumn === 'full_name' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
-            </th>
-            <th onClick={() => handleSort('email')}>
-              Email {sortColumn === 'email' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
-            </th>
-            <th onClick={() => handleSort('phone_number')}>
-              Phone Number {sortColumn === 'phone_number' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
-            </th>
-            <th onClick={() => handleSort('street_address')}>
-              Street Address {sortColumn === 'street_address' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
-            </th>
-            <th onClick={() => handleSort('city')}>
-              City {sortColumn === 'city' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
-            </th>
-            <th onClick={() => handleSort('zip_code')}>
-              ZIP Code {sortColumn === 'zip_code' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
-            </th>
-            <th onClick={() => handleSort('category')}>
-              Category {sortColumn === 'category' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {contacts.map((contact) => (
-            <tr key={contact.id}>
-              <td>{contact.full_name}</td>
-              <td>{contact.email}</td>
-              <td>{contact.phone_number}</td>
-              <td>{contact.street_address}</td>
-              <td>{contact.city}</td>
-              <td>{contact.zip_code}</td>
-              <td>{contact.category}</td>
+      {contacts.length > 0 ? (
+        <table>
+          <thead>
+            <tr>
+              <th onClick={() => handleSort('full_name')}>
+                Full Name {sortColumn === 'full_name' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
+              </th>
+              <th onClick={() => handleSort('email')}>
+                Email {sortColumn === 'email' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
+              </th>
+              <th onClick={() => handleSort('phone_number')}>
+                Phone Number {sortColumn === 'phone_number' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
+              </th>
+              <th onClick={() => handleSort('street_address')}>
+                Street Address {sortColumn === 'street_address' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
+              </th>
+              <th onClick={() => handleSort('city')}>
+                City {sortColumn === 'city' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
+              </th>
+              <th onClick={() => handleSort('zip_code')}>
+                ZIP Code {sortColumn === 'zip_code' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
+              </th>
+              <th onClick={() => handleSort('category')}>
+                Category {sortColumn === 'category' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
+              </th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {contacts.map((contact) => (
+              <tr key={contact.id}>
+                <td>{contact.full_name}</td>
+                <td>{contact.email}</td>
+                <td>{contact.phone_number}</td>
+                <td>{contact.street_address}</td>
+                <td>{contact.city}</td>
+                <td>{contact.zip_code}</td>
+                <td>{contact.category}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      ) : (
+        <p>No contacts found. Try adjusting your filters.</p>
+      )}
 
       {/* Pagination controls */}
       <div className="pagination">
@@ -191,12 +211,12 @@ function App() {
           Previous
         </button>
         <span>
-          Page {currentPage} of {totalPages}
+          Page {currentPage} of {totalPages || 1} {/* Prevent division by 0 */}
         </span>
-        <button onClick={() => setCurrentPage(currentPage + 1)} disabled={currentPage === totalPages}>
+        <button onClick={() => setCurrentPage(currentPage + 1)} disabled={currentPage === totalPages || totalPages === 0}>
           Next
         </button>
-        <button onClick={() => setCurrentPage(totalPages)} disabled={currentPage === totalPages}>
+        <button onClick={() => setCurrentPage(totalPages)} disabled={currentPage === totalPages || totalPages === 0}>
           Last
         </button>
       </div>

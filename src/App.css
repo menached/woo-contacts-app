@@ -2,126 +2,18 @@
   text-align: center;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.error {
+  color: red;
+  text-align: center;
 }
-
-.filter-controls {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-bottom: 20px;
-  align-items: flex-end; /* Align items at the bottom */
-}
-
-.filter-controls div {
-  flex: 1;
-  min-width: 150px;
-}
-
-.filter-controls .download-container {
-  flex: 0;
-  margin-left: auto; /* Aligns the button to the right */
-}
-
-.filter-controls select,
-.filter-controls input {
-  width: 100%;
-  padding: 8px;
-  margin: 10px 0;
-}
-
-button.download-button {
-  background-color: #4CAF50;
-  color: white;
-  padding: 10px;
-  border: none;
-  cursor: pointer;
-}
-
-button.download-button:hover:not(:disabled) {
-  background-color: #45a049;
-}
-
-button.download-button:disabled {
-  background-color: #ccc;
-  cursor: not-allowed;
-}
-
-
-
-/*.filter-controls {*/
-  /*display: flex;*/
-  /*flex-wrap: wrap;*/
-  /*gap: 10px;*/
-  /*margin-bottom: 20px;*/
-/*}*/
-
-/*.filter-controls div {*/
-  /*flex: 1;*/
-  /*min-width: 150px;*/
-/*}*/
-
-/*button.download-button {*/
-  /*background-color: #4CAF50;*/
-  /*color: white;*/
-  /*padding: 10px;*/
-  /*border: none;*/
-  /*cursor: pointer;*/
-/*}*/
-
-/*button.download-button:hover {*/
-  /*background-color: #45a049;*/
-/*}*/
-
-
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-}
-
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-
 
 .container {
   max-width: 900px;
   margin: 0 auto;
-  padding: 20px; /* Existing padding */
+  padding: 20px;
   border: 1px solid #ddd;
   border-radius: 8px;
   background-color: #fff;
-}
-
-body {
-  background-color: #f4f4f4;
-  margin: 0;
-  font-family: Arial, sans-serif;
 }
 
 h1 {
@@ -142,117 +34,150 @@ th, td {
 th {
   background-color: #f2f2f2;
   text-align: left;
-}
-
-
-/* Hide the page number display in the top pagination */
-.top-pagination span {
-  display: none;
-}
-
-
-/* Existing button styles */
-button {
-  background-color: #4CAF50;
-  color: white;
-  padding: 10px;
-  margin: 5px;
-  border: none;
   cursor: pointer;
-}
-
-button:disabled {
-  background-color: #ccc;
-}
-
-button:hover:not(:disabled) {
-  background-color: #45a049;
-}
-
-/* Less dominating pagination buttons */
-.pagination button {
-  background-color: #f2f2f2; /* Light gray background */
-  color: #333; /* Darker text color */
-  padding: 5px 10px; /* Smaller padding */
-  font-size: 0.9em; /* Slightly smaller font size */
-  border: 1px solid #ccc; /* Add a subtle border */
-  margin: 2px; /* Less margin between buttons */
-}
-
-.pagination button:hover:not(:disabled) {
-  background-color: #e0e0e0; /* Slightly darker gray on hover */
-}
-
-.pagination button:disabled {
-  background-color: #f9f9f9; /* Even lighter background for disabled */
-  color: #aaa; /* Lighter text color for disabled state */
-}
-
-
-
-/*button {*/
-  /*background-color: #4CAF50;*/
-  /*color: white;*/
-  /*padding: 10px;*/
-  /*margin: 5px;*/
-  /*border: none;*/
-  /*cursor: pointer;*/
-/*}*/
-
-/*button:disabled {*/
-  /*background-color: #ccc;*/
-/*}*/
-
-/*button:hover:not(:disabled) {*/
-  /*background-color: #45a049;*/
-/*}*/
-
-select {
-  padding: 8px;
-  margin: 10px 0;
-}
-
-.pagination {
-  display: flex;
-  justify-content: space-between;
 }
 
 /* Container for the filter controls */
 .filter-controls {
   display: flex;
-  justify-content: space-between; /* Spreads the items evenly */
-  flex-wrap: wrap; /* Allows wrapping if the screen is small */
-  gap: 10px; /* Adds spacing between the dropdowns */
-  margin-bottom: 20px; /* Adds space below the dropdowns */
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 20px;
+  align-items: flex-end;
 }
 
+/* Each filter control div */
 .filter-controls div {
-  flex: 1; /* Ensures all dropdowns take up equal space */
-  min-width: 150px; /* Optional: Set a minimum width for each dropdown */
+  flex: 1; /* Allow each element to grow equally */
+  min-width: 150px; /* Set a minimum width */
+  max-width: 220px; /* Ensure filters don't grow too large */
 }
 
-/* Style for each dropdown */
-.filter-controls select {
-  width: 100%; /* Make each dropdown take up full width of its container */
-  padding: 8px; /* Adds padding for better appearance */
+/* Limit the size of the select boxes to prevent overflow */
+.filter-controls select, 
+.filter-controls input {
+  width: 100%; /* Make the input and select fields take up full width */
+  padding: 8px; /* Add padding for better appearance */
+  margin: 10px 0;
+  box-sizing: border-box; /* Ensure padding doesn't exceed the width */
+  max-width: 100%; /* Prevent overflow of the select box */
 }
 
+/* Download button container positioned at the right */
+.filter-controls .download-container {
+  flex: 0;
+  margin-left: auto; /* Aligns the button to the right */
+}
 
 button.download-button {
-  float: right;
   background-color: #4CAF50;
   color: white;
   padding: 10px;
-  margin: 5px;
   border: none;
   cursor: pointer;
 }
 
 button.download-button:disabled {
   background-color: #ccc;
+  cursor: not-allowed;
 }
 
 button.download-button:hover:not(:disabled) {
   background-color: #45a049;
 }
+
+/* Style the table */
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+th {
+  background-color: #f2f2f2;
+  text-align: left;
+  cursor: pointer;
+}
+
+/* Pagination controls */
+.pagination {
+  display: flex;
+  justify-content: space-between;
+}
+
+.pagination button {
+  background-color: #f2f2f2;
+  color: #333;
+  padding: 5px 10px;
+  font-size: 0.9em;
+  border: 1px solid #ccc;
+  margin: 2px;
+}
+
+.pagination button:disabled {
+  background-color: #f9f9f9;
+  color: #aaa;
+  cursor: not-allowed;
+}
+
+
+
+/*.filter-controls {*/
+  /*display: flex;*/
+  /*flex-wrap: wrap;*/
+  /*gap: 10px;*/
+  /*margin-bottom: 20px;*/
+  /*align-items: flex-end;*/
+/*}*/
+
+/*.filter-controls div {*/
+  /*flex: 1;*/
+  /*min-width: 150px;*/
+/*}*/
+
+/*.filter-controls .download-container {*/
+  /*flex: 0;*/
+  /*margin-left: auto; [> Aligns the button to the right <]*/
+/*}*/
+
+/*button.download-button {*/
+  /*background-color: #4CAF50;*/
+  /*color: white;*/
+  /*padding: 10px;*/
+  /*border: none;*/
+  /*cursor: pointer;*/
+/*}*/
+
+/*button.download-button:disabled {*/
+  /*background-color: #ccc;*/
+  /*cursor: not-allowed;*/
+/*}*/
+
+/*button.download-button:hover:not(:disabled) {*/
+  /*background-color: #45a049;*/
+/*}*/
+
+/*.pagination {*/
+  /*display: flex;*/
+  /*justify-content: space-between;*/
+/*}*/
+
+/*.pagination button {*/
+  /*background-color: #f2f2f2;*/
+  /*color: #333;*/
+  /*padding: 5px 10px;*/
+  /*font-size: 0.9em;*/
+  /*border: 1px solid #ccc;*/
+  /*margin: 2px;*/
+/*}*/
+
+/*.pagination button:disabled {*/
+  /*background-color: #f9f9f9;*/
+  /*color: #aaa;*/
+  /*cursor: not-allowed;*/
+/*}*/
 
