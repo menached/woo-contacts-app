@@ -72,33 +72,51 @@ function App() {
     setSortOrder(order);
   };
 
-  // Handle CSV download
-  const handleDownloadCSV = () => {
-    setDownloadingCSV(true);  // Set the button as busy
-    const cityQuery = selectedCities.length > 0 ? selectedCities.join(',') : 'All';
-    const zipCodeQuery = selectedZipCodes.length > 0 ? selectedZipCodes.join(',') : 'All';
-    const areaCodeQuery = selectedAreaCodes.length > 0 ? selectedAreaCodes.join(',') : 'All';
+    // Handle CSV download
+    const handleDownloadCSV = () => {
+      setDownloadingCSV(true);  // Set the button as busy
+
+      const cityQuery = selectedCities.length > 0 ? selectedCities.join(',') : 'All';
+      const zipCodeQuery = selectedZipCodes.length > 0 ? selectedZipCodes.join(',') : 'All';
+      const areaCodeQuery = selectedAreaCodes.length > 0 ? selectedAreaCodes.join(',') : 'All';
+      
+      const query = `http://localhost:5000/contacts/download?city=${cityQuery}&zipCode=${zipCodeQuery}&areaCode=${areaCodeQuery}&category=${selectedCategory}&search=${searchQuery}`;
+
+      // Open the download in a new tab/window
+      window.open(query, '_blank');
+
+      // Reset after opening the new tab
+      setDownloadingCSV(false);
+    };
+
+
+  //// Handle CSV download
+  //const handleDownloadCSV = () => {
+    //setDownloadingCSV(true);  // Set the button as busy
+    //const cityQuery = selectedCities.length > 0 ? selectedCities.join(',') : 'All';
+    //const zipCodeQuery = selectedZipCodes.length > 0 ? selectedZipCodes.join(',') : 'All';
+    //const areaCodeQuery = selectedAreaCodes.length > 0 ? selectedAreaCodes.join(',') : 'All';
     
-    const query = `http://localhost:5000/contacts/download?city=${cityQuery}&zipCode=${zipCodeQuery}&areaCode=${areaCodeQuery}&category=${selectedCategory}&search=${searchQuery}`;
+    //const query = `http://localhost:5000/contacts/download?city=${cityQuery}&zipCode=${zipCodeQuery}&areaCode=${areaCodeQuery}&category=${selectedCategory}&search=${searchQuery}`;
     
-    axios({
-      url: query,
-      method: 'GET',
-      responseType: 'blob', // important for downloading files
-    }).then((response) => {
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', 'filtered_contacts.csv');
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);  // Clean up
-      setDownloadingCSV(false);  // Reset after download is complete
-    }).catch(error => {
-      console.error('Error downloading CSV:', error);
-      setDownloadingCSV(false);  // Reset even if download fails
-    });
-  };
+    //axios({
+      //url: query,
+      //method: 'GET',
+      //responseType: 'blob', // important for downloading files
+    //}).then((response) => {
+      //const url = window.URL.createObjectURL(new Blob([response.data]));
+      //const link = document.createElement('a');
+      //link.href = url;
+      //link.setAttribute('download', 'filtered_contacts.csv');
+      //document.body.appendChild(link);
+      //link.click();
+      //document.body.removeChild(link);  // Clean up
+      //setDownloadingCSV(false);  // Reset after download is complete
+    //}).catch(error => {
+      //console.error('Error downloading CSV:', error);
+      //setDownloadingCSV(false);  // Reset even if download fails
+    //});
+  //};
 
   // Handle multi-select change
   const handleMultiSelectChange = (event, setFunction) => {
