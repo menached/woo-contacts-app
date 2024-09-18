@@ -22,13 +22,15 @@ function App() {
   const [errorMessage, setErrorMessage] = useState('');
   const [downloadingCSV, setDownloadingCSV] = useState(false);
 
+  const API_URL = process.env.REACT_APP_API_URL || '/api';
+
   // Fetch contacts from the backend API with pagination, sorting, filters, and search
   const fetchContacts = (page, limit, sortColumn, sortOrder) => {
     const cityQuery = selectedCities.length > 0 ? selectedCities.join(',') : 'All';
     const zipCodeQuery = selectedZipCodes.length > 0 ? selectedZipCodes.join(',') : 'All';
     const areaCodeQuery = selectedAreaCodes.length > 0 ? selectedAreaCodes.join(',') : 'All';
 
-    let query = `http://localhost:5000/contacts?page=${page}&limit=${limit}&sortColumn=${sortColumn}&sortOrder=${sortOrder}&city=${cityQuery}&zipCode=${zipCodeQuery}&areaCode=${areaCodeQuery}&category=${selectedCategory}&search=${searchQuery}`;
+    let query = `${API_URL}/contacts?page=${page}&limit=${limit}&sortColumn=${sortColumn}&sortOrder=${sortOrder}&city=${cityQuery}&zipCode=${zipCodeQuery}&areaCode=${areaCodeQuery}&category=${selectedCategory}&search=${searchQuery}`;
     
     axios
       .get(query)
@@ -48,7 +50,7 @@ function App() {
   // Fetch filters (cities, zip codes, area codes, and categories) from the backend
   const fetchFilters = () => {
     axios
-      .get('http://localhost:5000/filters')
+      .get(`${API_URL}/filters`)
       .then(response => {
         setCities(response.data.cities);
         setZipCodes(response.data.zipCodes);
@@ -65,58 +67,26 @@ function App() {
     fetchContacts(currentPage, rowsPerPage, sortColumn, sortOrder);
   }, [currentPage, rowsPerPage, sortColumn, sortOrder, selectedCities, selectedZipCodes, selectedAreaCodes, selectedCategory, searchQuery]);
 
-  // Define the handleSort function to sort the table columns
+  // Handle sorting
   const handleSort = (column) => {
     const order = sortColumn === column && sortOrder === 'asc' ? 'desc' : 'asc';
     setSortColumn(column);
     setSortOrder(order);
   };
 
-    // Handle CSV download
-    const handleDownloadCSV = () => {
-      setDownloadingCSV(true);  // Set the button as busy
+  // Handle CSV download
+  const handleDownloadCSV = () => {
+    setDownloadingCSV(true);
 
-      const cityQuery = selectedCities.length > 0 ? selectedCities.join(',') : 'All';
-      const zipCodeQuery = selectedZipCodes.length > 0 ? selectedZipCodes.join(',') : 'All';
-      const areaCodeQuery = selectedAreaCodes.length > 0 ? selectedAreaCodes.join(',') : 'All';
-      
-      const query = `http://localhost:5000/contacts/download?city=${cityQuery}&zipCode=${zipCodeQuery}&areaCode=${areaCodeQuery}&category=${selectedCategory}&search=${searchQuery}`;
-
-      // Open the download in a new tab/window
-      window.open(query, '_blank');
-
-      // Reset after opening the new tab
-      setDownloadingCSV(false);
-    };
-
-
-  //// Handle CSV download
-  //const handleDownloadCSV = () => {
-    //setDownloadingCSV(true);  // Set the button as busy
-    //const cityQuery = selectedCities.length > 0 ? selectedCities.join(',') : 'All';
-    //const zipCodeQuery = selectedZipCodes.length > 0 ? selectedZipCodes.join(',') : 'All';
-    //const areaCodeQuery = selectedAreaCodes.length > 0 ? selectedAreaCodes.join(',') : 'All';
+    const cityQuery = selectedCities.length > 0 ? selectedCities.join(',') : 'All';
+    const zipCodeQuery = selectedZipCodes.length > 0 ? selectedZipCodes.join(',') : 'All';
+    const areaCodeQuery = selectedAreaCodes.length > 0 ? selectedAreaCodes.join(',') : 'All';
     
-    //const query = `http://localhost:5000/contacts/download?city=${cityQuery}&zipCode=${zipCodeQuery}&areaCode=${areaCodeQuery}&category=${selectedCategory}&search=${searchQuery}`;
-    
-    //axios({
-      //url: query,
-      //method: 'GET',
-      //responseType: 'blob', // important for downloading files
-    //}).then((response) => {
-      //const url = window.URL.createObjectURL(new Blob([response.data]));
-      //const link = document.createElement('a');
-      //link.href = url;
-      //link.setAttribute('download', 'filtered_contacts.csv');
-      //document.body.appendChild(link);
-      //link.click();
-      //document.body.removeChild(link);  // Clean up
-      //setDownloadingCSV(false);  // Reset after download is complete
-    //}).catch(error => {
-      //console.error('Error downloading CSV:', error);
-      //setDownloadingCSV(false);  // Reset even if download fails
-    //});
-  //};
+    const query = `${API_URL}/contacts/download?city=${cityQuery}&zipCode=${zipCodeQuery}&areaCode=${areaCodeQuery}&category=${selectedCategory}&search=${searchQuery}`;
+
+    window.open(query, '_blank');
+    setDownloadingCSV(false);
+  };
 
   // Handle multi-select change
   const handleMultiSelectChange = (event, setFunction) => {
@@ -181,39 +151,24 @@ function App() {
           <button 
             className="download-button" 
             onClick={handleDownloadCSV} 
-            disabled={downloadingCSV}  // Disable when downloading
-          >
+            disabled={downloadingCSV}>
             {downloadingCSV ? 'Downloading...' : 'Download for goAutodial'}
           </button>
         </div>
       </div>
 
-      {/* Table with sortable columns */}
+      {/* Contacts Table */}
       {contacts.length > 0 ? (
         <table>
           <thead>
             <tr>
-              <th onClick={() => handleSort('full_name')}>
-                Full Name {sortColumn === 'full_name' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
-              </th>
-              <th onClick={() => handleSort('email')}>
-                Email {sortColumn === 'email' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
-              </th>
-              <th onClick={() => handleSort('phone_number')}>
-                Phone Number {sortColumn === 'phone_number' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
-              </th>
-              <th onClick={() => handleSort('street_address')}>
-                Street Address {sortColumn === 'street_address' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
-              </th>
-              <th onClick={() => handleSort('city')}>
-                City {sortColumn === 'city' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
-              </th>
-              <th onClick={() => handleSort('zip_code')}>
-                ZIP Code {sortColumn === 'zip_code' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
-              </th>
-              <th onClick={() => handleSort('category')}>
-                Category {sortColumn === 'category' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
-              </th>
+              <th onClick={() => handleSort('full_name')}>Full Name</th>
+              <th onClick={() => handleSort('email')}>Email</th>
+              <th onClick={() => handleSort('phone_number')}>Phone Number</th>
+              <th onClick={() => handleSort('street_address')}>Street Address</th>
+              <th onClick={() => handleSort('city')}>City</th>
+              <th onClick={() => handleSort('zip_code')}>ZIP Code</th>
+              <th onClick={() => handleSort('category')}>Category</th>
             </tr>
           </thead>
           <tbody>
@@ -234,23 +189,13 @@ function App() {
         <p>No contacts found. Try adjusting your filters.</p>
       )}
 
-      {/* Pagination controls */}
+      {/* Pagination */}
       <div className="pagination">
-        <button onClick={() => setCurrentPage(1)} disabled={currentPage === 1}>
-          First
-        </button>
-        <button onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage === 1}>
-          Previous
-        </button>
-        <span>
-          Page {currentPage} of {totalPages || 1} {/* Prevent division by 0 */}
-        </span>
-        <button onClick={() => setCurrentPage(currentPage + 1)} disabled={currentPage === totalPages || totalPages === 0}>
-          Next
-        </button>
-        <button onClick={() => setCurrentPage(totalPages)} disabled={currentPage === totalPages || totalPages === 0}>
-          Last
-        </button>
+        <button onClick={() => setCurrentPage(1)} disabled={currentPage === 1}>First</button>
+        <button onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage === 1}>Previous</button>
+        <span>Page {currentPage} of {totalPages || 1}</span>
+        <button onClick={() => setCurrentPage(currentPage + 1)} disabled={currentPage === totalPages || totalPages === 0}>Next</button>
+        <button onClick={() => setCurrentPage(totalPages)} disabled={currentPage === totalPages || totalPages === 0}>Last</button>
       </div>
     </div>
   );
