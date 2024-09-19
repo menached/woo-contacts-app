@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import './App.css';
 
@@ -24,8 +24,8 @@ function App() {
 
   const API_URL = process.env.REACT_APP_API_URL || '/api';
 
-  // Fetch contacts from the backend API with pagination, sorting, filters, and search
-  const fetchContacts = (page, limit, sortColumn, sortOrder) => {
+  // Memoized function to fetch contacts
+  const fetchContacts = useCallback((page, limit, sortColumn, sortOrder) => {
     const cityQuery = selectedCities.length > 0 ? selectedCities.join(',') : 'All';
     const zipCodeQuery = selectedZipCodes.length > 0 ? selectedZipCodes.join(',') : 'All';
     const areaCodeQuery = selectedAreaCodes.length > 0 ? selectedAreaCodes.join(',') : 'All';
@@ -45,10 +45,10 @@ function App() {
         console.error('Error fetching contacts:', error);
         setErrorMessage('Failed to load contacts. Please try again later.');
       });
-  };
+  }, [selectedCities, selectedZipCodes, selectedAreaCodes, selectedCategory, searchQuery, API_URL]);
 
-  // Fetch filters (cities, zip codes, area codes, and categories) from the backend
-  const fetchFilters = () => {
+  // Memoized function to fetch filters
+  const fetchFilters = useCallback(() => {
     axios
       .get(`${API_URL}/filters`)
       .then(response => {
@@ -60,12 +60,12 @@ function App() {
       .catch(error => {
         console.error('Error fetching filters:', error);
       });
-  };
+  }, [API_URL]);
 
   useEffect(() => {
     fetchFilters();
     fetchContacts(currentPage, rowsPerPage, sortColumn, sortOrder);
-  }, [currentPage, rowsPerPage, sortColumn, sortOrder, selectedCities, selectedZipCodes, selectedAreaCodes, selectedCategory, searchQuery]);
+  }, [currentPage, rowsPerPage, sortColumn, sortOrder, fetchContacts, fetchFilters]);
 
   // Handle sorting
   const handleSort = (column) => {
