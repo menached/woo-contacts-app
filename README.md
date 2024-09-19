@@ -4,7 +4,7 @@ For generating goAutodial targetted campaigns.
 # Backend server component relies on node.js
 
 Run:
-    node server.js
+    npm start run
 
 ## Three components:  
 
