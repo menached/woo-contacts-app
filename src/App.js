@@ -24,7 +24,6 @@ function App() {
 
   const API_URL = process.env.REACT_APP_API_URL || '/api';
 
-  // Memoized function to fetch contacts
   const fetchContacts = useCallback((page, limit, sortColumn, sortOrder) => {
     const cityQuery = selectedCities.length > 0 ? selectedCities.join(',') : 'All';
     const zipCodeQuery = selectedZipCodes.length > 0 ? selectedZipCodes.join(',') : 'All';
@@ -39,15 +38,13 @@ function App() {
         setTotalPages(response.data.totalPages);
         setCurrentPage(response.data.currentPage);
         setTotalRecords(response.data.totalContacts);
-        setErrorMessage('');  // Reset error message
+        setErrorMessage('');
       })
       .catch(error => {
-        console.error('Error fetching contacts:', error);
         setErrorMessage('Failed to load contacts. Please try again later.');
       });
   }, [selectedCities, selectedZipCodes, selectedAreaCodes, selectedCategory, searchQuery, API_URL]);
 
-  // Memoized function to fetch filters
   const fetchFilters = useCallback(() => {
     axios
       .get(`${API_URL}/filters`)
@@ -67,14 +64,12 @@ function App() {
     fetchContacts(currentPage, rowsPerPage, sortColumn, sortOrder);
   }, [currentPage, rowsPerPage, sortColumn, sortOrder, fetchContacts, fetchFilters]);
 
-  // Handle sorting
   const handleSort = (column) => {
     const order = sortColumn === column && sortOrder === 'asc' ? 'desc' : 'asc';
     setSortColumn(column);
     setSortOrder(order);
   };
 
-  // Handle CSV download
   const handleDownloadCSV = () => {
     setDownloadingCSV(true);
 
@@ -88,10 +83,15 @@ function App() {
     setDownloadingCSV(false);
   };
 
-  // Handle multi-select change
-  const handleMultiSelectChange = (event, setFunction) => {
-    const selectedOptions = Array.from(event.target.selectedOptions, option => option.value);
-    setFunction(selectedOptions);
+  // Handle multi-select dropdowns with checkboxes
+  const handleCheckboxChange = (event, setFunction, selectedItems) => {
+    const value = event.target.value;
+    const checked = event.target.checked;
+    if (checked) {
+      setFunction([...selectedItems, value]);
+    } else {
+      setFunction(selectedItems.filter(item => item !== value));
+    }
   };
 
   return (
@@ -100,7 +100,6 @@ function App() {
 
       {errorMessage && <p className="error">{errorMessage}</p>}
 
-      {/* Filter Controls */}
       <div className="filter-controls">
         <div>
           <label>Rows per page: </label>
@@ -112,24 +111,67 @@ function App() {
             <option value={1000}>1000</option>
           </select>
         </div>
-        <div>
-          <label>City: </label>
-          <select multiple value={selectedCities} onChange={(e) => handleMultiSelectChange(e, setSelectedCities)}>
-            {cities.map((city) => <option key={city} value={city}>{city}</option>)}
-          </select>
+
+        {/* Checkbox Dropdown for Cities */}
+        <div className="dropdown">
+          <label>City:</label>
+          <div className="dropdown-content">
+            {cities.map((city) => (
+              <div key={city}>
+                <label>
+                  <input
+                    type="checkbox"
+                    value={city}
+                    checked={selectedCities.includes(city)}
+                    onChange={(e) => handleCheckboxChange(e, setSelectedCities, selectedCities)}
+                  />
+                  {city}
+                </label>
+              </div>
+            ))}
+          </div>
         </div>
-        <div>
-          <label>ZIP Code: </label>
-          <select multiple value={selectedZipCodes} onChange={(e) => handleMultiSelectChange(e, setSelectedZipCodes)}>
-            {zipCodes.map((zip) => <option key={zip} value={zip}>{zip}</option>)}
-          </select>
+
+        {/* Checkbox Dropdown for ZIP Codes */}
+        <div className="dropdown">
+          <label>ZIP Code:</label>
+          <div className="dropdown-content">
+            {zipCodes.map((zip) => (
+              <div key={zip}>
+                <label>
+                  <input
+                    type="checkbox"
+                    value={zip}
+                    checked={selectedZipCodes.includes(zip)}
+                    onChange={(e) => handleCheckboxChange(e, setSelectedZipCodes, selectedZipCodes)}
+                  />
+                  {zip}
+                </label>
+              </div>
+            ))}
+          </div>
         </div>
-        <div>
-          <label>Area Code: </label>
-          <select multiple value={selectedAreaCodes} onChange={(e) => handleMultiSelectChange(e, setSelectedAreaCodes)}>
-            {areaCodes.map((areaCode) => <option key={areaCode} value={areaCode}>{areaCode}</option>)}
-          </select>
+
+        {/* Checkbox Dropdown for Area Codes */}
+        <div className="dropdown">
+          <label>Area Code:</label>
+          <div className="dropdown-content">
+            {areaCodes.map((areaCode) => (
+              <div key={areaCode}>
+                <label>
+                  <input
+                    type="checkbox"
+                    value={areaCode}
+                    checked={selectedAreaCodes.includes(areaCode)}
+                    onChange={(e) => handleCheckboxChange(e, setSelectedAreaCodes, selectedAreaCodes)}
+                  />
+                  {areaCode}
+                </label>
+              </div>
+            ))}
+          </div>
         </div>
+
         <div>
           <label>Category: </label>
           <select value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)}>
@@ -146,7 +188,6 @@ function App() {
           />
         </div>
 
-        {/* Download CSV Button */}
         <div className="download-container">
           <button 
             className="download-button" 
@@ -189,7 +230,6 @@ function App() {
         <p>No contacts found. Try adjusting your filters.</p>
       )}
 
-      {/* Pagination */}
       <div className="pagination">
         <button onClick={() => setCurrentPage(1)} disabled={currentPage === 1}>First</button>
         <button onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage === 1}>Previous</button>
