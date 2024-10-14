@@ -1,4 +1,4 @@
-# Daves Contact Generator App
+# goAutodial Campaign Generator App
 For generating goAutodial targetted campaigns.
 
 # Backend server component relies on node.js
